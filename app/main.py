@@ -97,33 +97,31 @@ if __name__ == "__main__":
         offset = 0
         while True:
             relevant_departures = get_relevant_departures()
-
             next_departure = relevant_departures[0]
             second_next_departure = relevant_departures[1]
 
             departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
                              next_departure["destinationDisplay"]["frontText"]
-            # Recalculate minutes and text on every frame
+
             minutes_until_next_departure = get_minutes_until_departure(next_departure)
             minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
-            display_text_next_departure = (
+            new_text = (
                     departure_name + " " + str(minutes_until_next_departure) +
                     " og " + str(minutes_until_second_next_departure) + " min"
             )
-            text = display_text_next_departure
-            bbox = font.getbbox(text)
-            text_width = bbox[2] - bbox[0]
-            display_width = device.width
 
-            # Calculate current scroll position
+            # Only update text and width if the text has changed
+            if new_text != last_text:
+                text = new_text
+                bbox = font.getbbox(text)
+                text_width = bbox[2] - bbox[0]
+                last_text = new_text
+
             scroll_offset = offset % (text_width + display_width)
 
             with canvas(device) as draw:
                 draw.text((-scroll_offset + display_width, -2), text, fill="white", font=font)
             time.sleep(0.01)
-            if offset > 1_000_000:
-                offset = 0
-            else:
-                offset += 1
+            offset = (offset + 1) % 1_000_000
     except KeyboardInterrupt:
         GPIO.cleanup()
