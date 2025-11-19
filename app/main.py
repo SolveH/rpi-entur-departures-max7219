@@ -98,42 +98,39 @@ def display_next_departures_on_max7219():
 
     time.sleep(5)  # sleep some seconds to ensure cache is populated with first entry
 
-    try:
-        last_text = ""
-        text = ""
-        text_width = 0
-        display_width = device.width
-        offset = 0
-        while True:
-            relevant_departures = get_relevant_departures()
-            next_departure = relevant_departures[0]
-            second_next_departure = relevant_departures[1]
+    last_text = ""
+    text = ""
+    text_width = 0
+    display_width = device.width
+    offset = 0
+    while True:
+        relevant_departures = get_relevant_departures()
+        next_departure = relevant_departures[0]
+        second_next_departure = relevant_departures[1]
 
-            departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
-                             next_departure["destinationDisplay"]["frontText"]
+        departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
+                         next_departure["destinationDisplay"]["frontText"]
 
-            minutes_until_next_departure = get_minutes_until_departure(next_departure)
-            minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
-            new_text = (
-                    departure_name + " " + str(minutes_until_next_departure) +
-                    " og " + str(minutes_until_second_next_departure) + " min"
-            )
+        minutes_until_next_departure = get_minutes_until_departure(next_departure)
+        minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
+        new_text = (
+                departure_name + " " + str(minutes_until_next_departure) +
+                " og " + str(minutes_until_second_next_departure) + " min"
+        )
 
-            # Only update text and width if the text has changed
-            if new_text != last_text:
-                text = new_text
-                bbox = font.getbbox(text)
-                text_width = bbox[2] - bbox[0]
-                last_text = new_text
+        # Only update text and width if the text has changed
+        if new_text != last_text:
+            text = new_text
+            bbox = font.getbbox(text)
+            text_width = bbox[2] - bbox[0]
+            last_text = new_text
 
-            scroll_offset = offset % (text_width + display_width)
+        scroll_offset = offset % (text_width + display_width)
 
-            with canvas(device) as draw:
-                draw.text((-scroll_offset + display_width, -1), text, fill="white", font=font)
-            time.sleep(0.01)
-            offset = (offset + 1) % 1_000_000
-    except KeyboardInterrupt:
-        GPIO.cleanup()
+        with canvas(device) as draw:
+            draw.text((-scroll_offset + display_width, -1), text, fill="white", font=font)
+        time.sleep(0.01)
+        offset = (offset + 1) % 1_000_000
 
 
 def start():
@@ -144,6 +141,8 @@ def start():
             f.write(str(pid))
         print("Started with PID", pid)
         sys.exit(0)
+    sys.stdout = open("/tmp/rutetider.log", "a")
+    sys.stderr = open("/tmp/rutetider.log", "a")
     display_next_departures_on_max7219()
 
 
