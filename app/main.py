@@ -144,7 +144,7 @@ def start():
             f.write(str(pid))
         print("Started with PID", pid)
         sys.exit(0)
-        display_next_departures_on_max7219()
+    display_next_departures_on_max7219()
 
 
 def stop():
