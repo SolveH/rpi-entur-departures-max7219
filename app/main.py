@@ -4,9 +4,8 @@ import time
 
 import RPi.GPIO as GPIO
 import requests
+from PIL import ImageFont
 from luma.core.interface.serial import spi, noop
-from luma.core.legacy import show_message
-from luma.core.legacy.font import proportional, LCD_FONT
 from luma.core.render import canvas
 from luma.core.virtual import viewport
 from luma.led_matrix.device import max7219
@@ -92,14 +91,22 @@ if __name__ == "__main__":
 
     departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
                      next_departure["destinationDisplay"]["frontText"]
-    display_text_next_departure = departure_name + " " + str(minutes_until_next_departure) + " og " + str(minutes_until_second_next_departure) + " min"
+    display_text_next_departure = departure_name + " " + str(minutes_until_next_departure) + " og " + str(
+        minutes_until_second_next_departure) + " min"
 
-    if False: # TODO: legge til sjekk på om det kjøres på noko anna enn pi
+    if False:  # TODO: legge til sjekk på om det kjøres på noko anna enn pi
         display_text_on_target_device(display_text_next_departure, width=40, delay=0.07)
+
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 8)
+    text = display_text_next_departure
+    text_width, _ = font.getsize(text)
+    display_width = device.width
 
     try:
         while True:
-            with canvas(virtual) as draw:
-                show_message(device, display_text_next_departure, fill="white", font=proportional(LCD_FONT), scroll_delay=0.05)
+            for offset in range(text_width + display_width):
+                with canvas(device) as draw:
+                    draw.text((-offset + display_width, 0), text, fill="white", font=font)
+                time.sleep(0.05)
     except KeyboardInterrupt:
         GPIO.cleanup()
