@@ -100,6 +100,6 @@ if __name__ == "__main__":
     try:
         while True:
             with canvas(virtual) as draw:
-                show_message(device, display_text_next_departure, fill="white", font=proportional(LCD_FONT), scroll_delay=2.00)
+                show_message(device, display_text_next_departure, fill="white", font=proportional(LCD_FONT), scroll_delay=0.05)
     except KeyboardInterrupt:
         GPIO.cleanup()
