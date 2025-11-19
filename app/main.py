@@ -14,8 +14,9 @@ from luma.core.render import canvas
 from luma.core.virtual import viewport
 from luma.led_matrix.device import max7219
 
-STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
+PID_FILE = "/tmp/rutetider.pid"
 
+STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
 QUAY_ID_SINSEN_T_DIRECTION_SOUTH = "NSR:Quay:11078"
 
 serial = spi(port=0, device=0, gpio=noop())
