@@ -63,7 +63,7 @@ def cache_updater(quay_id: str):
     while True:
         cache["data"] = get_estimated_calls(quay_id)
         cache["timestamp"] = time.time()
-        print("Updated cache (background)", flush=True)
+        # print("Updated cache (background)", flush=True)
         time.sleep(60)
 
 
