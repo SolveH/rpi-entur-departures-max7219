@@ -107,7 +107,7 @@ if __name__ == "__main__":
         while True:
             for offset in range(text_width + display_width):
                 with canvas(device) as draw:
-                    draw.text((-offset + display_width, 0), text, fill="white", font=font)
+                    draw.text((-offset + display_width, -1), text, fill="white", font=font)
                 time.sleep(0.05)
     except KeyboardInterrupt:
         GPIO.cleanup()
