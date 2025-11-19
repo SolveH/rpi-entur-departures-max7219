@@ -1,18 +1,15 @@
 import datetime
 import sys
 import time
-import RPi.GPIO as GPIO
-from time import sleep, strftime
-from datetime import datetime
 
+import RPi.GPIO as GPIO
+import requests
 from luma.core.interface.serial import spi, noop
+from luma.core.legacy import show_message
+from luma.core.legacy.font import proportional, LCD_FONT
 from luma.core.render import canvas
 from luma.core.virtual import viewport
 from luma.led_matrix.device import max7219
-from luma.core.legacy import text, show_message
-from luma.core.legacy.font import proportional, CP437_FONT, LCD_FONT
-
-import requests
 
 STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
 
