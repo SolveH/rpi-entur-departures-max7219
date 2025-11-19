@@ -67,7 +67,7 @@ def cache_updater(quay_id: str):
     while True:
         cache["data"] = get_estimated_calls(quay_id)
         cache["timestamp"] = time.time()
-        print("Updated cache (background)")
+        print("Updated cache (background)", flush=True)
         time.sleep(60)
 
 
@@ -141,8 +141,9 @@ def start():
             f.write(str(pid))
         print("Started with PID", pid)
         sys.exit(0)
-    sys.stdout = open("/tmp/rutetider.log", "a")
-    sys.stderr = open("/tmp/rutetider.log", "a")
+    sys.stdout = open("/tmp/rutetider.log", "a", buffering=1)
+    sys.stderr = open("/tmp/rutetider.log", "a", buffering=1)
+    print("Child process started", flush=True)
     display_next_departures_on_max7219()
 
 
