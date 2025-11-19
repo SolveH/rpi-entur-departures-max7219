@@ -92,7 +92,8 @@ if __name__ == "__main__":
                      next_departure["destinationDisplay"]["frontText"]
     display_text_next_departure = departure_name + " " + str(minutes_until_next_departure) + " min"
 
-    display_text_on_target_device(display_text_next_departure, width=40, delay=0.07)
+    if False: # TODO: legge til sjekk på om det kjøres på noko anna enn pi
+        display_text_on_target_device(display_text_next_departure, width=40, delay=0.07)
 
     try:
         while True:
