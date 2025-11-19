@@ -1,6 +1,10 @@
+import argparse
 import datetime
-import time
+import os
+import signal
+import sys
 import threading
+import time
 
 import RPi.GPIO as GPIO
 import requests
@@ -87,11 +91,11 @@ def get_minutes_until_departure(departure: dict) -> int:
     return minutes_until
 
 
-if __name__ == "__main__":
+def display_next_departures_on_max7219():
     threading.Thread(target=cache_updater, args=(QUAY_ID_SINSEN_T_DIRECTION_SOUTH,), daemon=True).start()
     font = ImageFont.truetype("/home/solveh/code/rutetider/fonts/code2000.ttf", 8)
 
-    time.sleep(5) # sleep some seconds to ensure cache is populated with first entry
+    time.sleep(5)  # sleep some seconds to ensure cache is populated with first entry
 
     try:
         last_text = ""
@@ -129,3 +133,40 @@ if __name__ == "__main__":
             offset = (offset + 1) % 1_000_000
     except KeyboardInterrupt:
         GPIO.cleanup()
+
+
+def start():
+    pid = os.fork()
+    if pid > 0:
+        # Parent process: write child PID and exit
+        with open(PID_FILE, "w") as f:
+            f.write(str(pid))
+        print("Started with PID", pid)
+        sys.exit(0)
+        display_next_departures_on_max7219()
+
+
+def stop():
+    if not os.path.exists(PID_FILE):
+        print("Not running.")
+        return
+    with open(PID_FILE) as f:
+        pid = int(f.read())
+    try:
+        os.kill(pid, signal.SIGTERM)
+        print("Stopped process", pid)
+        GPIO.cleanup()
+    except ProcessLookupError:
+        print("Process not found.")
+    os.remove(PID_FILE)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("command", choices=["start", "stop"])
+    args = parser.parse_args()
+
+    if args.command == "start":
+        start()
+    elif args.command == "stop":
+        stop()
