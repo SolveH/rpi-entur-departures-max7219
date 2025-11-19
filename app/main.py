@@ -9,8 +9,7 @@ from luma.core.interface.serial import spi, noop
 from luma.core.render import canvas
 from luma.core.virtual import viewport
 from luma.led_matrix.device import max7219
-from luma.core.legacy import LCD_FONT
-from luma.core.legacy.font import proportional
+from luma.core.legacy.font import proportional, SINCLAIR_FONT
 
 STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
 
@@ -100,7 +99,7 @@ if __name__ == "__main__":
         display_text_on_target_device(display_text_next_departure, width=40, delay=0.07)
 
     MY_FONT = {
-        **LCD_FONT,
+        **SINCLAIR_FONT,
         'ø': [0x00, 0x36, 0x49, 0x49, 0x49, 0x36, 0x00],  # Example bitmap
         # Add 'æ', 'å', etc.
     }
