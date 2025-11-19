@@ -97,7 +97,7 @@ if __name__ == "__main__":
     if False:  # TODO: legge til sjekk på om det kjøres på noko anna enn pi
         display_text_on_target_device(display_text_next_departure, width=40, delay=0.07)
 
-    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 8)
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 8)
     text = display_text_next_departure
     bbox = font.getbbox(text)
     text_width = bbox[2] - bbox[0]
