@@ -90,24 +90,33 @@ if __name__ == "__main__":
 
     departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
                      next_departure["destinationDisplay"]["frontText"]
-    display_text_next_departure = departure_name + " " + str(minutes_until_next_departure) + " og " + str(
-        minutes_until_second_next_departure) + " min"
 
     if False:  # TODO: legge til sjekk på om det kjøres på noko anna enn pi
         display_text_on_target_device(display_text_next_departure, width=40, delay=0.07)
 
     font = ImageFont.truetype("/home/solveh/code/rutetider/fonts/code2000.ttf", 8)
-    text = display_text_next_departure
-    bbox = font.getbbox(text)
-    text_width = bbox[2] - bbox[0]
-    display_width = device.width
 
 
     try:
-        while True:
-            for offset in range(text_width + display_width):
-                with canvas(device) as draw:
-                    draw.text((-offset + display_width, -1), text, fill="white", font=font)
-                time.sleep(0.05)
+        last_minutes = None
+        for offset in range(10000):
+            # Recalculate minutes and text on every frame
+            minutes_until_next_departure = get_minutes_until_departure(next_departure)
+            minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
+            display_text_next_departure = (
+                    departure_name + " " + str(minutes_until_next_departure) +
+                    " og " + str(minutes_until_second_next_departure) + " min"
+            )
+            text = display_text_next_departure
+            bbox = font.getbbox(text)
+            text_width = bbox[2] - bbox[0]
+            display_width = device.width
+
+            # Calculate current scroll position
+            scroll_offset = offset % (text_width + display_width)
+
+            with canvas(device) as draw:
+                draw.text((-scroll_offset + display_width, -2), text, fill="white", font=font)
+            time.sleep(0.03)
     except KeyboardInterrupt:
         GPIO.cleanup()
