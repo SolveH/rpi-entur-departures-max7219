@@ -1,5 +1,6 @@
 import datetime
 import time
+import threading
 
 import RPi.GPIO as GPIO
 import requests
@@ -57,19 +58,16 @@ def get_estimated_calls(quay_id: str) -> list:
     return expected_departures
 
 
-def get_estimated_calls_cached(quay_id: str) -> list:
-    now = time.time()
-    if (cache["data"] is {} or
-            now - cache["timestamp"] > 60
-    ):
+def cache_updater(quay_id: str):
+    while True:
         cache["data"] = get_estimated_calls(quay_id)
-        cache["timestamp"] = now
-        print("Updated cache")
-    return cache["data"]
+        cache["timestamp"] = time.time()
+        print("Updated cache (background)")
+        time.sleep(60)
 
 
 def get_relevant_departures() -> list:
-    estimated_calls = get_estimated_calls_cached(QUAY_ID_SINSEN_T_DIRECTION_SOUTH)
+    estimated_calls = cache["data"]
     return filter_relevant_departures(estimated_calls, "5")
 
 
@@ -90,8 +88,7 @@ def get_minutes_until_departure(departure: dict) -> int:
 
 
 if __name__ == "__main__":
-
-
+    threading.Thread(target=cache_updater, args=(QUAY_ID_SINSEN_T_DIRECTION_SOUTH,), daemon=True).start()
     font = ImageFont.truetype("/home/solveh/code/rutetider/fonts/code2000.ttf", 8)
 
     try:
