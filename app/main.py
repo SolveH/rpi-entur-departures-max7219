@@ -9,6 +9,7 @@ from luma.core.interface.serial import spi, noop
 from luma.core.render import canvas
 from luma.core.virtual import viewport
 from luma.led_matrix.device import max7219
+from luma.led_matrix.font import proportional, LCD_FONT
 
 STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
 
