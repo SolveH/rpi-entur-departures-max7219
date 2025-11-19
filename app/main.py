@@ -1,12 +1,27 @@
 import datetime
 import sys
 import time
+import RPi.GPIO as GPIO
+from time import sleep, strftime
+from datetime import datetime
+
+from luma.core.interface.serial import spi, noop
+from luma.core.render import canvas
+from luma.core.virtual import viewport
+from luma.led_matrix.device import max7219
+from luma.core.legacy import text, show_message
+from luma.core.legacy.font import proportional, CP437_FONT, LCD_FONT
 
 import requests
 
 STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
 
 QUAY_ID_SINSEN_T_DIRECTION_SOUTH = "NSR:Quay:11078"
+
+serial = spi(port=0, device=0, gpio=noop())
+device = max7219(serial, width=32, height=8, block_orientation=-90)
+device.contrast(5)
+virtual = viewport(device, width=32, height=16)
 
 
 def get_estimated_calls(quay_id: str) -> list:
@@ -73,6 +88,7 @@ if __name__ == "__main__":
     relevant_departures = filter_relevant_departures(expected_departures_for_quay, "5")
 
     next_departure = relevant_departures[0]
+    print(next_departure)
     minutes_until_next_departure = get_minutes_until_departure(next_departure)
 
     departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
@@ -80,3 +96,10 @@ if __name__ == "__main__":
     display_text_next_departure = departure_name + " " + str(minutes_until_next_departure) + " min"
 
     display_text_on_target_device(display_text_next_departure, width=40, delay=0.07)
+
+    try:
+        while True:
+            with canvas(virtual) as draw:
+                show_message(device, display_text_next_departure, fill="white", font=proportional(LCD_FONT), scroll_delay=0.08)
+    except KeyboardInterrupt:
+        GPIO.cleanup()
