@@ -99,8 +99,10 @@ if __name__ == "__main__":
 
     font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 8)
     text = display_text_next_departure
-    text_width, _ = font.getsize(text)
+    bbox = font.getbbox(text)
+    text_width = bbox[2] - bbox[0]
     display_width = device.width
+
 
     try:
         while True:
