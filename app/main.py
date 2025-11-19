@@ -111,7 +111,7 @@ if __name__ == "__main__":
             minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
             new_text = (
                     departure_name + " " + str(minutes_until_next_departure) +
-                    ", " + str(minutes_until_second_next_departure) + " min"
+                    " og " + str(minutes_until_second_next_departure) + " min"
             )
 
             # Only update text and width if the text has changed
