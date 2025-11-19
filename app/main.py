@@ -111,7 +111,7 @@ if __name__ == "__main__":
             minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
             new_text = (
                     departure_name + " " + str(minutes_until_next_departure) +
-                    " og " + str(minutes_until_second_next_departure) + " min"
+                    ", " + str(minutes_until_second_next_departure) + " min"
             )
 
             # Only update text and width if the text has changed
@@ -124,7 +124,7 @@ if __name__ == "__main__":
             scroll_offset = offset % (text_width + display_width)
 
             with canvas(device) as draw:
-                draw.text((-scroll_offset + display_width, -2), text, fill="white", font=font)
+                draw.text((-scroll_offset + display_width, -1), text, fill="white", font=font)
             time.sleep(0.01)
             offset = (offset + 1) % 1_000_000
     except KeyboardInterrupt:
