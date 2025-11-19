@@ -91,6 +91,8 @@ if __name__ == "__main__":
     threading.Thread(target=cache_updater, args=(QUAY_ID_SINSEN_T_DIRECTION_SOUTH,), daemon=True).start()
     font = ImageFont.truetype("/home/solveh/code/rutetider/fonts/code2000.ttf", 8)
 
+    time.sleep(5) # sleep some seconds to ensure cache is populated with first entry
+
     try:
         offset = 0
         while True:
