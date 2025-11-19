@@ -98,13 +98,7 @@ if __name__ == "__main__":
     if False:  # TODO: legge til sjekk på om det kjøres på noko anna enn pi
         display_text_on_target_device(display_text_next_departure, width=40, delay=0.07)
 
-    MY_FONT = {
-        **SINCLAIR_FONT,
-        'ø': [0x00, 0x36, 0x49, 0x49, 0x49, 0x36, 0x00],  # Example bitmap
-        # Add 'æ', 'å', etc.
-    }
-
-    font = proportional(MY_FONT)
+    font = proportional(SINCLAIR_FONT)
     text = display_text_next_departure
     bbox = font.getbbox(text)
     text_width = bbox[2] - bbox[0]
