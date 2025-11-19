@@ -85,8 +85,6 @@ if __name__ == "__main__":
     next_departure = relevant_departures[0]
     print(next_departure)
     second_next_departure = relevant_departures[1]
-    minutes_until_next_departure = get_minutes_until_departure(next_departure)
-    minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
 
     departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
                      next_departure["destinationDisplay"]["frontText"]
