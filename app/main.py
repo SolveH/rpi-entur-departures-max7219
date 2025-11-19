@@ -1,4 +1,5 @@
 import argparse
+import atexit
 import datetime
 import os
 import signal
@@ -93,6 +94,17 @@ def display_next_departures_on_max7219():
     device.contrast(3)
     virtual = viewport(device, width=32, height=16)
 
+    def cleanup():
+        device.clear()
+        GPIO.cleanup()
+
+    atexit.register(cleanup)
+
+    def handle_sigterm(signum, frame):
+        sys.exit(0)
+
+    signal.signal(signal.SIGTERM, handle_sigterm)
+
     threading.Thread(target=cache_updater, args=(QUAY_ID_SINSEN_T_DIRECTION_SOUTH,), daemon=True).start()
     font = ImageFont.truetype("/home/solveh/code/rutetider/fonts/code2000.ttf", 8)
 
@@ -156,7 +168,6 @@ def stop():
     try:
         os.kill(pid, signal.SIGTERM)
         print("Stopped process", pid)
-        GPIO.cleanup()
     except ProcessLookupError:
         print("Process not found.")
     os.remove(PID_FILE)
