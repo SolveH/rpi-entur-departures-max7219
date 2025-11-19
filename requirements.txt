@@ -2,3 +2,4 @@ requests
 rich
 luma.led-matrix
 RPi.GPIO
+spidev
