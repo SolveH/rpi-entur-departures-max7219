@@ -65,8 +65,6 @@ def get_estimated_calls_cached(quay_id: str) -> list:
         cache["data"] = get_estimated_calls(quay_id)
         cache["timestamp"] = now
         print("Updated cache")
-    else:
-        print("Using cached data")
     return cache["data"]
 
 
