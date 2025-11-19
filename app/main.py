@@ -17,7 +17,7 @@ QUAY_ID_SINSEN_T_DIRECTION_SOUTH = "NSR:Quay:11078"
 
 serial = spi(port=0, device=0, gpio=noop())
 device = max7219(serial, width=32, height=8, block_orientation=-90)
-device.contrast(5)
+device.contrast(3)
 virtual = viewport(device, width=32, height=16)
 
 
@@ -100,6 +100,6 @@ if __name__ == "__main__":
     try:
         while True:
             with canvas(virtual) as draw:
-                show_message(device, display_text_next_departure, fill="white", font=proportional(LCD_FONT), scroll_delay=0.08)
+                show_message(device, display_text_next_departure, fill="white", font=proportional(LCD_FONT), scroll_delay=2.00)
     except KeyboardInterrupt:
         GPIO.cleanup()
