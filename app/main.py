@@ -115,6 +115,6 @@ if __name__ == "__main__":
 
             with canvas(device) as draw:
                 draw.text((-scroll_offset + display_width, -2), text, fill="white", font=font)
-            time.sleep(0.03)
+            time.sleep(0.01)
     except KeyboardInterrupt:
         GPIO.cleanup()
