@@ -9,7 +9,6 @@ from luma.core.interface.serial import spi, noop
 from luma.core.render import canvas
 from luma.core.virtual import viewport
 from luma.led_matrix.device import max7219
-from luma.core.legacy.font import proportional, SINCLAIR_FONT
 
 STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
 
@@ -79,6 +78,9 @@ def display_text_on_target_device(text, width=30, delay=0.1, repeat=2):
             time.sleep(delay)
     print()  # Move to next line after done
 
+def make_font(name, size):
+    font_path = str(Path(__file__).resolve().parent.joinpath('fonts', name))
+    return ImageFont.truetype(font_path, size)
 
 if __name__ == "__main__":
     expected_departures_for_quay = get_estimated_calls(QUAY_ID_SINSEN_T_DIRECTION_SOUTH)
@@ -98,7 +100,7 @@ if __name__ == "__main__":
     if False:  # TODO: legge til sjekk på om det kjøres på noko anna enn pi
         display_text_on_target_device(display_text_next_departure, width=40, delay=0.07)
 
-    font = proportional(SINCLAIR_FONT)
+    font = make_font("code2000.ttf", 8)
     text = display_text_next_departure
     bbox = font.getbbox(text)
     text_width = bbox[2] - bbox[0]
