@@ -86,11 +86,13 @@ if __name__ == "__main__":
 
     next_departure = relevant_departures[0]
     print(next_departure)
+    second_next_departure = relevant_departures[1]
     minutes_until_next_departure = get_minutes_until_departure(next_departure)
+    minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
 
     departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
                      next_departure["destinationDisplay"]["frontText"]
-    display_text_next_departure = departure_name + " " + str(minutes_until_next_departure) + " min"
+    display_text_next_departure = departure_name + " " + str(minutes_until_next_departure) + " og " + str(minutes_until_second_next_departure) + " min"
 
     if False: # TODO: legge til sjekk på om det kjøres på noko anna enn pi
         display_text_on_target_device(display_text_next_departure, width=40, delay=0.07)
