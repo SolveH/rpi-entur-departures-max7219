@@ -94,6 +94,10 @@ if __name__ == "__main__":
     time.sleep(5) # sleep some seconds to ensure cache is populated with first entry
 
     try:
+        last_text = ""
+        text = ""
+        text_width = 0
+        display_width = device.width
         offset = 0
         while True:
             relevant_departures = get_relevant_departures()
