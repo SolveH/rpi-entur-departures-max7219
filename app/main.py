@@ -1,5 +1,4 @@
 import datetime
-import sys
 import time
 
 import RPi.GPIO as GPIO
@@ -18,6 +17,11 @@ serial = spi(port=0, device=0, gpio=noop())
 device = max7219(serial, width=32, height=8, block_orientation=-90)
 device.contrast(3)
 virtual = viewport(device, width=32, height=16)
+
+cache = {
+    "data": [],
+    "timestamp": 0
+}
 
 
 def get_estimated_calls(quay_id: str) -> list:
@@ -53,6 +57,24 @@ def get_estimated_calls(quay_id: str) -> list:
     return expected_departures
 
 
+def get_estimated_calls_cached(quay_id: str) -> list:
+    now = time.time()
+    if (cache["data"] is {} or
+            now - cache["timestamp"] > 60
+    ):
+        cache["data"] = get_estimated_calls(quay_id)
+        cache["timestamp"] = now
+        print("Updated cache")
+    else:
+        print("Using cached data")
+    return cache["data"]
+
+
+def get_relevant_departures() -> list:
+    estimated_calls = get_estimated_calls_cached(QUAY_ID_SINSEN_T_DIRECTION_SOUTH)
+    return filter_relevant_departures(estimated_calls, "5")
+
+
 def filter_relevant_departures(expected_departures: list, service_journey_line_public_code: str) -> list:
     filtered_departures: list[dict] = [
         departure for departure in expected_departures
@@ -69,35 +91,21 @@ def get_minutes_until_departure(departure: dict) -> int:
     return minutes_until
 
 
-def display_text_on_target_device(text, width=30, delay=0.1, repeat=2):
-    padded = " " * width + text + " " * width
-    for _ in range(repeat * len(text)):
-        for i in range(len(text) + width):
-            sys.stdout.write('\r' + padded[i:i + width])
-            sys.stdout.flush()
-            time.sleep(delay)
-    print()  # Move to next line after done
-
 if __name__ == "__main__":
-    expected_departures_for_quay = get_estimated_calls(QUAY_ID_SINSEN_T_DIRECTION_SOUTH)
-    relevant_departures = filter_relevant_departures(expected_departures_for_quay, "5")
 
-    next_departure = relevant_departures[0]
-    print(next_departure)
-    second_next_departure = relevant_departures[1]
-
-    departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
-                     next_departure["destinationDisplay"]["frontText"]
-
-    if False:  # TODO: legge til sjekk på om det kjøres på noko anna enn pi
-        display_text_on_target_device(display_text_next_departure, width=40, delay=0.07)
 
     font = ImageFont.truetype("/home/solveh/code/rutetider/fonts/code2000.ttf", 8)
 
-
     try:
-        last_minutes = None
-        for offset in range(10000):
+        offset = 0
+        while True:
+            relevant_departures = get_relevant_departures()
+
+            next_departure = relevant_departures[0]
+            second_next_departure = relevant_departures[1]
+
+            departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
+                             next_departure["destinationDisplay"]["frontText"]
             # Recalculate minutes and text on every frame
             minutes_until_next_departure = get_minutes_until_departure(next_departure)
             minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
@@ -116,5 +124,9 @@ if __name__ == "__main__":
             with canvas(device) as draw:
                 draw.text((-scroll_offset + display_width, -2), text, fill="white", font=font)
             time.sleep(0.01)
+            if offset > 1_000_000:
+                offset = 0
+            else:
+                offset += 1
     except KeyboardInterrupt:
         GPIO.cleanup()
