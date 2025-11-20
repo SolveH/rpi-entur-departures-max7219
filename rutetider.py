@@ -16,6 +16,11 @@ from luma.led_matrix.device import max7219
 STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
 QUAY_ID_SINSEN_T_DIRECTION_SOUTH = "NSR:Quay:11078"
 
+serial = spi(port=0, device=0, gpio=noop())
+device = max7219(serial, width=32, height=8, block_orientation=-90)
+device.contrast(3)
+virtual = viewport(device, width=32, height=16)
+
 cache = {
     "data": [],
     "timestamp": 0
@@ -85,11 +90,6 @@ def get_minutes_until_departure(departure: dict) -> int:
 
 
 def display_next_departures_on_max7219():
-    serial = spi(port=0, device=0, gpio=noop())
-    device = max7219(serial, width=32, height=8, block_orientation=-90)
-    device.contrast(3)
-    virtual = viewport(device, width=32, height=16)
-
     def cleanup():
         device.clear()
         GPIO.cleanup()
