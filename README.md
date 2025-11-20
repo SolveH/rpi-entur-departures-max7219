@@ -24,7 +24,7 @@ text on the 32x8 MAX7219 display.
 | 5   | CLK  | Clock       | 23      | GPIO 11 (SPI CLK) |
 
 - SPI needs to be enabled on the Raspberry Pi.
-    - Enable SPI on the Raspberry Pi: `sudo raspi-config` -> `Interface Options -> `I4 SPI` -> `Yes`
+    - Enable SPI on the Raspberry Pi: `sudo raspi-config` -> `Interface Options` -> `I4 SPI` -> `Yes`
 - Install relevant APT packages by following instructions
   on [Luma_LED-Matrix installation](https://luma-led-matrix.readthedocs.io/en/latest/install.html)
 
