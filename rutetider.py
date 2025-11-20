@@ -6,12 +6,13 @@ import threading
 import time
 
 import RPi.GPIO as GPIO
-import requests
 from PIL import ImageFont
 from luma.core.interface.serial import spi, noop
 from luma.core.render import canvas
 from luma.core.virtual import viewport
 from luma.led_matrix.device import max7219
+
+from entur_client import get_estimated_calls_for_quay
 
 STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
 QUAY_ID_SINSEN_T_DIRECTION_SOUTH = "NSR:Quay:11078"
@@ -22,42 +23,9 @@ cache = {
 }
 
 
-def get_estimated_calls(quay_id: str) -> list:
-    url = "https://api.entur.io/journey-planner/v3/graphql"
-    headers = {
-        "Content-Type": "application/json",
-        "ET-Client-Name": "hunvik_com-hobbyproject"
-    }
-    query = """
-    {
-      quay(id: "%s") {
-        id
-        name
-        estimatedCalls(timeRange: 7200, numberOfDepartures: 5) {
-          realtime
-          expectedDepartureTime
-          destinationDisplay {
-            frontText
-          }
-          serviceJourney {
-            line {
-              publicCode
-            }
-          }
-        }
-      }
-    }
-    """ % quay_id
-    response = requests.post(url, json={"query": query}, headers=headers)
-    data = response.json()
-    expected_departures = data["data"]["quay"]["estimatedCalls"]
-
-    return expected_departures
-
-
 def cache_updater(quay_id: str):
     while True:
-        cache["data"] = get_estimated_calls(quay_id)
+        cache["data"] = get_estimated_calls_for_quay(quay_id)
         cache["timestamp"] = time.time()
         # print("Updated cache (background)", flush=True)
         time.sleep(60)
