@@ -14,24 +14,26 @@ from luma.led_matrix.device import max7219
 
 from entur_client import get_estimated_calls_for_quay
 
+
 STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
 QUAY_ID_SINSEN_T_DIRECTION_SOUTH = "NSR:Quay:11078"
+RINGEN_VIA_STORO_SUBWAY_CODE = "5"
 
 cache = {
-    "data": [],
+    QUAY_ID_SINSEN_T_DIRECTION_SOUTH: [],
 }
 
 
 def cache_updater(quay_id: str):
     while True:
-        cache["data"] = get_estimated_calls_for_quay(quay_id)
+        cache[QUAY_ID_SINSEN_T_DIRECTION_SOUTH] = get_estimated_calls_for_quay(quay_id)
         # print("Updated cache (background)", flush=True)
         time.sleep(60)
 
 
 def get_relevant_departures() -> list:
-    estimated_calls = cache["data"]
-    return filter_relevant_departures(estimated_calls, "5")
+    estimated_calls = cache[QUAY_ID_SINSEN_T_DIRECTION_SOUTH]
+    return filter_relevant_departures(estimated_calls, RINGEN_VIA_STORO_SUBWAY_CODE)
 
 
 def filter_relevant_departures(expected_departures: list, service_journey_line_public_code: str) -> list:
