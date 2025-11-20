@@ -52,3 +52,5 @@ text on the 32x8 MAX7219 display.
     ```bash
     python main.py stop
     ```
+
+**Disclaimer:** This project is not affiliated with or endorsed by Entur AS. It uses public APIs provided by Entur for personal, non-commercial use.
