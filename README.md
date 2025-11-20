@@ -5,9 +5,21 @@ to a Raspberry Pi (I use a Pi Zero W). It is configured to display the departure
 `Sinsen T`, but can easily be changed to display any other route by changing the constants in `rutetider.py`.
 
 The project uses the [Luma_LED-Matrix library](https://luma-led-matrix.readthedocs.io/en/latest/intro.html) to display
-text on the MAX7219 display.
+text on the 32x8 MAX7219 display.
+
+![Demo](./demo.gif)
 
 # Prerequisites
+
+- Wire the MAX7219 display to the Raspberry Pi
+
+| Pin | Name | Remarks     | RPi Pin | RPi Function      |
+|-----|------|-------------|---------|-------------------|
+| 1   | VCC  | +5V Power   | 2       | 5V0               |
+| 2   | GND  | Ground      | 6       | GND               |
+| 3   | DIN  | Data In     | 19      | GPIO 10 (MOSI)    |
+| 4   | CS   | Chip Select | 24      | GPIO 8 (SPI CS0)  |
+| 5   | CLK  | Clock       | 23      | GPIO 11 (SPI CLK) |
 
 - SPI needs to be enabled on the Raspberry Pi.
     - Enable SPI on the Raspberry Pi: `sudo raspi-config` -> `Interface Options -> `I4 SPI` -> `Yes`
