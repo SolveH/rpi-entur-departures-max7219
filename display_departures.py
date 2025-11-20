@@ -84,6 +84,8 @@ def display_next_departures_on_max7219():
     device.contrast(3)
     virtual = viewport(device, width=32, height=16)
 
+    font = get_font()
+
     def cleanup():
         device.clear()
         GPIO.cleanup()
@@ -96,8 +98,6 @@ def display_next_departures_on_max7219():
     signal.signal(signal.SIGTERM, handle_sigterm)
 
     threading.Thread(target=cache_updater, args=(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH,), daemon=True).start()
-    # TODO: fikse hardkoda url
-    font = get_font()
 
     time.sleep(5)  # sleep some seconds to ensure cache is populated with first entry
 
