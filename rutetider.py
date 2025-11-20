@@ -1,7 +1,5 @@
-import argparse
 import atexit
 import datetime
-import os
 import signal
 import sys
 import threading
@@ -14,8 +12,6 @@ from luma.core.interface.serial import spi, noop
 from luma.core.render import canvas
 from luma.core.virtual import viewport
 from luma.led_matrix.device import max7219
-
-PID_FILE = "/tmp/rutetider.pid"
 
 STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
 QUAY_ID_SINSEN_T_DIRECTION_SOUTH = "NSR:Quay:11078"
@@ -106,6 +102,7 @@ def display_next_departures_on_max7219():
     signal.signal(signal.SIGTERM, handle_sigterm)
 
     threading.Thread(target=cache_updater, args=(QUAY_ID_SINSEN_T_DIRECTION_SOUTH,), daemon=True).start()
+    # TODO: fikse hardkoda url
     font = ImageFont.truetype("/home/solveh/code/rutetider/fonts/code2000.ttf", 8)
 
     time.sleep(5)  # sleep some seconds to ensure cache is populated with first entry
@@ -143,42 +140,3 @@ def display_next_departures_on_max7219():
             draw.text((-scroll_offset + display_width, -1), text, fill="white", font=font)
         time.sleep(0.01)
         offset = (offset + 1) % 1_000_000
-
-
-def start():
-    pid = os.fork()
-    if pid > 0:
-        # Parent process: write child PID and exit
-        with open(PID_FILE, "w") as f:
-            f.write(str(pid))
-        print("Started with PID", pid)
-        sys.exit(0)
-    sys.stdout = open("/tmp/rutetider.log", "a", buffering=1)
-    sys.stderr = open("/tmp/rutetider.log", "a", buffering=1)
-    print("Child process started", flush=True)
-    display_next_departures_on_max7219()
-
-
-def stop():
-    if not os.path.exists(PID_FILE):
-        print("Not running.")
-        return
-    with open(PID_FILE) as f:
-        pid = int(f.read())
-    try:
-        os.kill(pid, signal.SIGTERM)
-        print("Stopped process", pid)
-    except ProcessLookupError:
-        print("Process not found.")
-    os.remove(PID_FILE)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=["start", "stop"])
-    args = parser.parse_args()
-
-    if args.command == "start":
-        start()
-    elif args.command == "stop":
-        stop()
