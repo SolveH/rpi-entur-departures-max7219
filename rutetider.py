@@ -14,25 +14,23 @@ from luma.led_matrix.device import max7219
 
 from entur_client import get_estimated_calls_for_quay
 
-
 STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
-QUAY_ID_SINSEN_T_DIRECTION_SOUTH = "NSR:Quay:11078"
+QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH = "NSR:Quay:11078"
 RINGEN_VIA_STORO_SUBWAY_CODE = "5"
 
 cache = {
-    QUAY_ID_SINSEN_T_DIRECTION_SOUTH: [],
+    QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH: [],
 }
 
 
 def cache_updater(quay_id: str):
     while True:
-        cache[QUAY_ID_SINSEN_T_DIRECTION_SOUTH] = get_estimated_calls_for_quay(quay_id)
-        # print("Updated cache (background)", flush=True)
+        cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH] = get_estimated_calls_for_quay(quay_id)
         time.sleep(60)
 
 
 def get_relevant_departures() -> list:
-    estimated_calls = cache[QUAY_ID_SINSEN_T_DIRECTION_SOUTH]
+    estimated_calls = cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH]
     return filter_relevant_departures(estimated_calls, RINGEN_VIA_STORO_SUBWAY_CODE)
 
 
@@ -74,6 +72,11 @@ def get_next_departures_display_text(relevant_departures: list) -> str:
         return "Ingen rutetider tilgjengelig"
 
 
+def get_font() -> FreeTypeFont:
+    font_path = os.path.join(os.path.dirname(__file__), "fonts", "code2000.ttf")
+    font = ImageFont.truetype(font_path, 8)
+
+
 def display_next_departures_on_max7219():
     serial = spi(port=0, device=0, gpio=noop())
     device = max7219(serial, width=32, height=8, block_orientation=-90)
@@ -91,9 +94,9 @@ def display_next_departures_on_max7219():
 
     signal.signal(signal.SIGTERM, handle_sigterm)
 
-    threading.Thread(target=cache_updater, args=(QUAY_ID_SINSEN_T_DIRECTION_SOUTH,), daemon=True).start()
+    threading.Thread(target=cache_updater, args=(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH,), daemon=True).start()
     # TODO: fikse hardkoda url
-    font = ImageFont.truetype("/home/solveh/code/rutetider/fonts/code2000.ttf", 8)
+    font = get_font()
 
     time.sleep(5)  # sleep some seconds to ensure cache is populated with first entry
 
