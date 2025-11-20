@@ -50,6 +50,28 @@ def get_minutes_until_departure(departure: dict) -> int:
     return minutes_until
 
 
+def get_next_departures_display_text(relevant_departures: list) -> str:
+    if len(relevant_departures) >= 2:
+        next_departure = relevant_departures[0]
+        second_next_departure = relevant_departures[1]
+
+        departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
+                         next_departure["destinationDisplay"]["frontText"]
+
+        minutes_until_next_departure = get_minutes_until_departure(next_departure)
+        minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
+        return (departure_name + " " + str(minutes_until_next_departure) +
+                " og " + str(minutes_until_second_next_departure) + " min")
+    elif len(relevant_departures) == 1:
+        next_departure = relevant_departures[0]
+        departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
+                         next_departure["destinationDisplay"]["frontText"]
+        minutes_until_next_departure = get_minutes_until_departure(next_departure)
+        return departure_name + " " + str(minutes_until_next_departure) + " min"
+    else:
+        return "Ingen rutetider tilgjengelig"
+
+
 def display_next_departures_on_max7219():
     serial = spi(port=0, device=0, gpio=noop())
     device = max7219(serial, width=32, height=8, block_orientation=-90)
@@ -80,31 +102,9 @@ def display_next_departures_on_max7219():
     offset = 0
     while True:
         relevant_departures = get_relevant_departures()
-        if len(relevant_departures) >= 2:
-            next_departure = relevant_departures[0]
-            second_next_departure = relevant_departures[1]
+        new_text = get_next_departures_display_text(relevant_departures)
 
-            departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
-                             next_departure["destinationDisplay"]["frontText"]
-
-            minutes_until_next_departure = get_minutes_until_departure(next_departure)
-            minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
-            new_text = (
-                    departure_name + " " + str(minutes_until_next_departure) +
-                    " og " + str(minutes_until_second_next_departure) + " min"
-            )
-        elif len(relevant_departures) == 1:
-            next_departure = relevant_departures[0]
-            departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
-                             next_departure["destinationDisplay"]["frontText"]
-            minutes_until_next_departure = get_minutes_until_departure(next_departure)
-            new_text = (
-                    departure_name + " " + str(minutes_until_next_departure) + " min"
-            )
-        else:
-            new_text = "Ingen rutetider tilgjengelig"
-
-        # Only update text and width if the text has changed
+        # Only update text and width if the text has changed to avoid stutter
         if new_text != last_text:
             text = new_text
             bbox = font.getbbox(text)

@@ -7,7 +7,7 @@ def get_estimated_calls_for_quay(quay_id: str) -> list:
         "Content-Type": "application/json",
         "ET-Client-Name": "hunvik_com-hobbyproject"
     }
-    timeRange = 1000
+    timeRange = 7200
     numberOfDepartures = 5
     query = """
     {
