@@ -3,7 +3,7 @@ import os
 import signal
 import sys
 
-from rutetider import display_next_departures_on_max7219  # and any other needed symbols
+from display_departures import display_next_departures_on_max7219  # and any other needed symbols
 
 PID_FILE = "/tmp/rutetider.pid"
 
