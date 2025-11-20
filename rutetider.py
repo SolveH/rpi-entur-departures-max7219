@@ -19,14 +19,12 @@ QUAY_ID_SINSEN_T_DIRECTION_SOUTH = "NSR:Quay:11078"
 
 cache = {
     "data": [],
-    "timestamp": 0
 }
 
 
 def cache_updater(quay_id: str):
     while True:
         cache["data"] = get_estimated_calls_for_quay(quay_id)
-        cache["timestamp"] = time.time()
         # print("Updated cache (background)", flush=True)
         time.sleep(60)
 
@@ -82,18 +80,29 @@ def display_next_departures_on_max7219():
     offset = 0
     while True:
         relevant_departures = get_relevant_departures()
-        next_departure = relevant_departures[0]
-        second_next_departure = relevant_departures[1]
+        if len(relevant_departures) >= 2:
+            next_departure = relevant_departures[0]
+            second_next_departure = relevant_departures[1]
 
-        departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
-                         next_departure["destinationDisplay"]["frontText"]
+            departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
+                             next_departure["destinationDisplay"]["frontText"]
 
-        minutes_until_next_departure = get_minutes_until_departure(next_departure)
-        minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
-        new_text = (
-                departure_name + " " + str(minutes_until_next_departure) +
-                " og " + str(minutes_until_second_next_departure) + " min"
-        )
+            minutes_until_next_departure = get_minutes_until_departure(next_departure)
+            minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
+            new_text = (
+                    departure_name + " " + str(minutes_until_next_departure) +
+                    " og " + str(minutes_until_second_next_departure) + " min"
+            )
+        elif len(relevant_departures) == 1:
+            next_departure = relevant_departures[0]
+            departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
+                             next_departure["destinationDisplay"]["frontText"]
+            minutes_until_next_departure = get_minutes_until_departure(next_departure)
+            new_text = (
+                    departure_name + " " + str(minutes_until_next_departure) + " min"
+            )
+        else:
+            new_text = "Ingen rutetider tilgjengelig"
 
         # Only update text and width if the text has changed
         if new_text != last_text:
