@@ -1,14 +1,21 @@
+import os
+
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+
+ET_CLIENT_NAME = os.environ["ET_CLIENT_NAME"]
 
 
 def get_estimated_calls_for_quay(quay_id: str) -> list:
     url = "https://api.entur.io/journey-planner/v3/graphql"
     headers = {
         "Content-Type": "application/json",
-        "ET-Client-Name": "hunvik_com-hobbyproject"
+        "ET-Client-Name": ET_CLIENT_NAME
     }
-    timeRange = 7200
-    numberOfDepartures = 5
+    time_range = 7200
+    number_of_departures = 5
     query = """
     {
       quay(id: "%s") {
@@ -28,7 +35,7 @@ def get_estimated_calls_for_quay(quay_id: str) -> list:
         }
       }
     }
-    """ % (quay_id, timeRange, numberOfDepartures)
+    """ % (quay_id, time_range, number_of_departures)
     response = requests.post(url, json={"query": query}, headers=headers)
     data = response.json()
     expected_departures = data["data"]["quay"]["estimatedCalls"]

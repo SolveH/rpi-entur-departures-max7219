@@ -17,7 +17,7 @@ from entur_client import get_estimated_calls_for_quay
 
 STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
 QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH = "NSR:Quay:11078"
-RINGEN_VIA_STORO_SUBWAY_CODE = "5"
+RINGEN_VIA_STORO_LINE_PUBLIC_CODE = "5"
 
 cache = {
     QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH: [],
@@ -32,7 +32,7 @@ def cache_updater(quay_id: str):
 
 def get_relevant_departures() -> list:
     estimated_calls = cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH]
-    return filter_relevant_departures(estimated_calls, RINGEN_VIA_STORO_SUBWAY_CODE)
+    return filter_relevant_departures(estimated_calls, RINGEN_VIA_STORO_LINE_PUBLIC_CODE)
 
 
 def filter_relevant_departures(expected_departures: list, service_journey_line_public_code: str) -> list:
@@ -73,7 +73,7 @@ def get_next_departures_display_text(relevant_departures: list) -> str:
         return "Ingen rutetider tilgjengelig"
 
 
-def get_font() -> ImageFont:
+def get_font():
     font_path = os.path.join(os.path.dirname(__file__), "fonts", "code2000.ttf")
     return ImageFont.truetype(font_path, 8)
 
