@@ -1,8 +1,10 @@
 # rpi-entur-departures-max7219
 
-A Python script for displaying realtime departure times from Entur on a MAX7219 LED dot matrix display connected
-to a Raspberry Pi (I use a Pi Zero W). It is configured to display the departure times for `5 Sognsvann via Tøyen` from
-`Sinsen T`, but can easily be changed to display any other route by changing the constants in `rutetider.py`.
+A Python script for displaying realtime departure times
+from [Entur Journey Planner](https://developer.entur.org/pages-journeyplanner-journeyplanner) on a MAX7219 LED dot
+matrix display connected to a Raspberry Pi (I use a Pi Zero W). It is configured to display the departure times for
+`5 Sognsvann via Tøyen` from `Sinsen T`, but can easily be changed to display any other route by changing the constants
+in `rutetider.py`.
 
 The project uses the [Luma_LED-Matrix library](https://luma-led-matrix.readthedocs.io/en/latest/intro.html) to display
 text on the 32x8 MAX7219 display.
@@ -38,7 +40,7 @@ text on the 32x8 MAX7219 display.
     ```bash
     pip install -r requirements.txt
     ```
-4. Set the `ET_CLIENT_NAME` environment variable:
+4. Set the `ET_CLIENT_NAME` environment variable (necessary to comply with Entur's terms of use):
     ```bash
     export ET_CLIENT_NAME=your_client_name
    ```
