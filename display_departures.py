@@ -129,7 +129,7 @@ def display_next_departures_on_max7219():
         ringen_via_toyen_text = get_relevant_departures_compact_display_text(relevant_departures_ringen_via_toyen, "Tøyen")
         ringen_via_storo_text = get_relevant_departures_compact_display_text(relevant_departures_ringen_via_storo, "Storo")
         bergkrystallen_via_storo_text = get_relevant_departures_compact_display_text(relevant_departures_bergkrystallen_via_storo, "Storo")
-        new_text = ringen_via_storo_text + ringen_via_toyen_text + bergkrystallen_via_storo_text
+        new_text = ringen_via_toyen_text + ringen_via_storo_text + bergkrystallen_via_storo_text
 
         if len(new_text) == 0:
             new_text = "Ingen rutetider tilgjengelig"
