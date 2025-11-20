@@ -75,7 +75,7 @@ def get_next_departures_display_text(relevant_departures: list) -> str:
 
 def get_font() -> ImageFont:
     font_path = os.path.join(os.path.dirname(__file__), "fonts", "code2000.ttf")
-    font = ImageFont.truetype(font_path, 8)
+    return ImageFont.truetype(font_path, 8)
 
 
 def display_next_departures_on_max7219():
