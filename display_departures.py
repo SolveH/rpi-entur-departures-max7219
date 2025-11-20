@@ -16,29 +16,31 @@ from luma.led_matrix.device import max7219
 from entur_client import get_estimated_calls_for_quay
 
 STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
-QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH = "NSR:Quay:11078"
-RINGEN_VIA_STORO_LINE_PUBLIC_CODE = "5"
+QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH = "NSR:Quay:11077" # 5 Ringen via Storo and 4 Bergkrystallen via Storo
+QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH = "NSR:Quay:11078" # 5 Sognsvann via Tøyen and 4 Vestli
+RINGEN_VIA_TOYEN_LINE_PUBLIC_CODE = "5"
 
 cache = {
     QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH: [],
 }
 
 
-def cache_updater(quay_id: str):
+def cache_updater():
     while True:
-        cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH] = get_estimated_calls_for_quay(quay_id)
+        cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH] = get_estimated_calls_for_quay(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH)
+        cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH] = get_estimated_calls_for_quay(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH)
         time.sleep(60)
 
 
 def get_relevant_departures() -> list:
     estimated_calls = cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH]
-    return filter_relevant_departures(estimated_calls, RINGEN_VIA_STORO_LINE_PUBLIC_CODE)
+    return filter_relevant_departures(estimated_calls, [RINGEN_VIA_TOYEN_LINE_PUBLIC_CODE])
 
 
-def filter_relevant_departures(expected_departures: list, service_journey_line_public_code: str) -> list:
+def filter_relevant_departures(expected_departures: list, service_journey_line_public_codes: list) -> list:
     filtered_departures: list[dict] = [
         departure for departure in expected_departures
-        if departure["serviceJourney"]["line"]["publicCode"] == service_journey_line_public_code
+        if departure["serviceJourney"]["line"]["publicCode"] in service_journey_line_public_codes
     ]
     return filtered_departures
 
@@ -97,7 +99,8 @@ def display_next_departures_on_max7219():
 
     signal.signal(signal.SIGTERM, handle_sigterm)
 
-    threading.Thread(target=cache_updater, args=(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH,), daemon=True).start()
+    # Fetch and cache data from Entur API in a separate thread to avoid stutter
+    threading.Thread(target=cache_updater, daemon=True).start()
 
     time.sleep(5)  # sleep some seconds to ensure cache is populated with first entry
 
