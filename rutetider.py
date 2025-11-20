@@ -1,5 +1,6 @@
 import atexit
 import datetime
+import os
 import signal
 import sys
 import threading
@@ -72,7 +73,7 @@ def get_next_departures_display_text(relevant_departures: list) -> str:
         return "Ingen rutetider tilgjengelig"
 
 
-def get_font() -> FreeTypeFont:
+def get_font() -> ImageFont:
     font_path = os.path.join(os.path.dirname(__file__), "fonts", "code2000.ttf")
     font = ImageFont.truetype(font_path, 8)
 
