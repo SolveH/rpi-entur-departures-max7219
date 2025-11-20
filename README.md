@@ -26,9 +26,9 @@ text on the 32x8 MAX7219 display.
 - Install relevant APT packages by following instructions
   on [Luma_LED-Matrix installation](https://luma-led-matrix.readthedocs.io/en/latest/install.html)
 
-# Local development setup
+# Running the script/application
 
-1. Make a copy of `.env.template` and replace placeholders with relevant values.
+1. Make a copy of `.env.template` to `.env` and replace placeholders with relevant values.
 2. Create and activate a virtual environment:
     ```bash
     python -m venv .venv
