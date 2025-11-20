@@ -55,23 +55,25 @@ def get_minutes_until_departure(departure: dict) -> int:
     return minutes_until
 
 
-def get_next_departures_display_text_one_direction(relevant_departures: list) -> str:
+def get_next_departures_display_text_one_direction() -> str:
+    relevant_departures = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH, RINGEN_VIA_TOYEN_LINE_PUBLIC_CODE)
     if len(relevant_departures) >= 2:
         next_departure = relevant_departures[0]
         second_next_departure = relevant_departures[1]
+        minutes_until_next_departure = get_minutes_until_departure(next_departure)
+        minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
 
         departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
                          next_departure["destinationDisplay"]["frontText"]
 
-        minutes_until_next_departure = get_minutes_until_departure(next_departure)
-        minutes_until_second_next_departure = get_minutes_until_departure(second_next_departure)
         return (departure_name + " " + str(minutes_until_next_departure) +
                 " og " + str(minutes_until_second_next_departure) + " min")
     elif len(relevant_departures) == 1:
         next_departure = relevant_departures[0]
+        minutes_until_next_departure = get_minutes_until_departure(next_departure)
+
         departure_name = next_departure["serviceJourney"]["line"]["publicCode"] + " " + \
                          next_departure["destinationDisplay"]["frontText"]
-        minutes_until_next_departure = get_minutes_until_departure(next_departure)
         return departure_name + " " + str(minutes_until_next_departure) + " min"
     else:
         return "Ingen rutetider tilgjengelig"
@@ -86,6 +88,16 @@ def get_relevant_departures_compact_display_text(departures: list, direction_nam
         display_text += departure["serviceJourney"]["line"]["publicCode"] + " " + direction_name + ": " + str(minutes_until_departure) + " min "
     return display_text
 
+
+def get_relevant_departures_display_text_mutliple_directions():
+    relevant_departures_ringen_via_toyen = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH, RINGEN_VIA_TOYEN_LINE_PUBLIC_CODE)[:2]
+    relevant_departures_ringen_via_storo = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH, RINGEN_VIA_STORO_LINE_PUBLIC_CODE)[:1]
+    relevant_departures_bergkrystallen_via_storo = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH, BERGKRYSTALLEN_VIA_STORO_LINE_PUBLIC_CODE)[:1]
+
+    ringen_via_toyen_text = get_relevant_departures_compact_display_text(relevant_departures_ringen_via_toyen, "Tøyen")
+    ringen_via_storo_text = get_relevant_departures_compact_display_text(relevant_departures_ringen_via_storo, "Storo")
+    bergkrystallen_via_storo_text = get_relevant_departures_compact_display_text(relevant_departures_bergkrystallen_via_storo, "Storo")
+    return ringen_via_toyen_text + ringen_via_storo_text + bergkrystallen_via_storo_text
 
 def get_font():
     font_path = os.path.join(os.path.dirname(__file__), "fonts", "code2000.ttf")
@@ -122,14 +134,8 @@ def display_next_departures_on_max7219():
     display_width = device.width
     offset = 0
     while True:
-        relevant_departures_ringen_via_toyen = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH, RINGEN_VIA_TOYEN_LINE_PUBLIC_CODE)[:2]
-        relevant_departures_ringen_via_storo = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH, RINGEN_VIA_STORO_LINE_PUBLIC_CODE)[:1]
-        relevant_departures_bergkrystallen_via_storo = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH, BERGKRYSTALLEN_VIA_STORO_LINE_PUBLIC_CODE)[:1]
-
-        ringen_via_toyen_text = get_relevant_departures_compact_display_text(relevant_departures_ringen_via_toyen, "Tøyen")
-        ringen_via_storo_text = get_relevant_departures_compact_display_text(relevant_departures_ringen_via_storo, "Storo")
-        bergkrystallen_via_storo_text = get_relevant_departures_compact_display_text(relevant_departures_bergkrystallen_via_storo, "Storo")
-        new_text = ringen_via_toyen_text + ringen_via_storo_text + bergkrystallen_via_storo_text
+        # new_text = get_next_departures_display_text_one_direction()
+        new_text = get_relevant_departures_display_text_mutliple_directions()
 
         if len(new_text) == 0:
             new_text = "Ingen rutetider tilgjengelig"
