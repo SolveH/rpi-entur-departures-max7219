@@ -24,6 +24,8 @@ BERGKRYSTALLEN_VIA_STORO_LINE_PUBLIC_CODE = "4"
 
 cache = {
     QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH: [],
+    QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH: [],
+    "display_text": ""
 }
 
 
@@ -32,6 +34,13 @@ def cache_updater():
         cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH] = get_estimated_calls_for_quay(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH)
         cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH] = get_estimated_calls_for_quay(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH)
         time.sleep(60)
+
+
+def display_text_update():
+    while True:
+        # cache["display_text"] = get_next_departures_display_text_one_direction()
+        cache["display_text"] = get_relevant_departures_display_text_mutliple_directions()
+        time.sleep(5)
 
 
 def get_relevant_departures(quay_id: str, line_public_code: str) -> list:
@@ -128,14 +137,15 @@ def display_next_departures_on_max7219():
 
     time.sleep(5)  # sleep some seconds to ensure cache is populated with first entry
 
+    threading.Thread(target=display_text_update, daemon=True).start()
+
     last_text = ""
     text = ""
     text_width = 0
     display_width = device.width
     offset = 0
     while True:
-        # new_text = get_next_departures_display_text_one_direction()
-        new_text = get_relevant_departures_display_text_mutliple_directions()
+        new_text = cache["display_text"]
 
         if len(new_text) == 0:
             new_text = "Ingen rutetider tilgjengelig"
