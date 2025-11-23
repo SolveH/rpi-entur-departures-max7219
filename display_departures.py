@@ -161,5 +161,5 @@ def display_next_departures_on_max7219():
 
         with canvas(device) as draw:
             draw.text((-scroll_offset + display_width, -1), text, fill="white", font=font)
-        time.sleep(0.01)
+        time.sleep(0.02)
         offset = (offset + 1) % 1_000_000
