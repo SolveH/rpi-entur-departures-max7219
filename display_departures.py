@@ -31,8 +31,11 @@ cache = {
 
 def cache_updater():
     while True:
-        cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH] = get_estimated_calls_for_quay(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH)
-        cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH] = get_estimated_calls_for_quay(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH)
+        try:
+            cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH] = get_estimated_calls_for_quay(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH)
+            cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH] = get_estimated_calls_for_quay(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH)
+        except Exception as e:
+            print("Unable to fetch data from Entur. Cache is not updated.", e)
         time.sleep(60)
 
 
