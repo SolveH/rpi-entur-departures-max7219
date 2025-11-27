@@ -5,6 +5,7 @@ import signal
 import sys
 import threading
 import time
+import traceback
 
 import RPi.GPIO as GPIO
 from PIL import ImageFont
@@ -16,8 +17,8 @@ from luma.led_matrix.device import max7219
 from entur_client import get_estimated_calls_for_quay
 
 STOP_PLACE_ID_SINSEN_T = "NSR:StopPlace:61268"
-QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH = "NSR:Quay:11077" # 5 Ringen via Storo and 4 Bergkrystallen via Storo
-QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH = "NSR:Quay:11078" # 5 Sognsvann via Tøyen and 4 Vestli
+QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH = "NSR:Quay:11077"  # 5 Ringen via Storo and 4 Bergkrystallen via Storo
+QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH = "NSR:Quay:11078"  # 5 Sognsvann via Tøyen and 4 Vestli
 RINGEN_VIA_TOYEN_LINE_PUBLIC_CODE = "5"
 RINGEN_VIA_STORO_LINE_PUBLIC_CODE = "5"
 BERGKRYSTALLEN_VIA_STORO_LINE_PUBLIC_CODE = "4"
@@ -32,10 +33,14 @@ cache = {
 def cache_updater():
     while True:
         try:
-            cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH] = get_estimated_calls_for_quay(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH)
-            cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH] = get_estimated_calls_for_quay(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH)
+            cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH] = get_estimated_calls_for_quay(
+                QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH)
+            cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH] = get_estimated_calls_for_quay(
+                QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH)
         except Exception as e:
-            print("Unable to fetch data from Entur. Cache is not updated.", e)
+            now = datetime.datetime.now()
+            print(f"[{now}] Unable to fetch data from Entur. Cache was not updated.", e)
+            traceback.print_exc()
         time.sleep(60)
 
 
@@ -68,7 +73,8 @@ def get_minutes_until_departure(departure: dict) -> int:
 
 
 def get_next_departures_display_text_one_direction() -> str:
-    relevant_departures = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH, RINGEN_VIA_TOYEN_LINE_PUBLIC_CODE)
+    relevant_departures = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH,
+                                                  RINGEN_VIA_TOYEN_LINE_PUBLIC_CODE)
     if len(relevant_departures) >= 2:
         next_departure = relevant_departures[0]
         second_next_departure = relevant_departures[1]
@@ -97,19 +103,26 @@ def get_relevant_departures_compact_display_text(departures: list, direction_nam
     display_text = ""
     for departure in departures:
         minutes_until_departure = get_minutes_until_departure(departure)
-        display_text += departure["serviceJourney"]["line"]["publicCode"] + " " + direction_name + ": " + str(minutes_until_departure) + " min "
+        display_text += departure["serviceJourney"]["line"]["publicCode"] + " " + direction_name + ": " + str(
+            minutes_until_departure) + " min "
     return display_text
 
 
 def get_relevant_departures_display_text_mutliple_directions():
-    relevant_departures_ringen_via_toyen = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH, RINGEN_VIA_TOYEN_LINE_PUBLIC_CODE)[:2]
-    relevant_departures_ringen_via_storo = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH, RINGEN_VIA_STORO_LINE_PUBLIC_CODE)[:1]
-    relevant_departures_bergkrystallen_via_storo = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH, BERGKRYSTALLEN_VIA_STORO_LINE_PUBLIC_CODE)[:1]
+    relevant_departures_ringen_via_toyen = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH,
+                                                                   RINGEN_VIA_TOYEN_LINE_PUBLIC_CODE)[:2]
+    relevant_departures_ringen_via_storo = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH,
+                                                                   RINGEN_VIA_STORO_LINE_PUBLIC_CODE)[:1]
+    relevant_departures_bergkrystallen_via_storo = get_relevant_departures(QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH,
+                                                                           BERGKRYSTALLEN_VIA_STORO_LINE_PUBLIC_CODE)[
+        :1]
 
     ringen_via_toyen_text = get_relevant_departures_compact_display_text(relevant_departures_ringen_via_toyen, "Tøyen")
     ringen_via_storo_text = get_relevant_departures_compact_display_text(relevant_departures_ringen_via_storo, "Storo")
-    bergkrystallen_via_storo_text = get_relevant_departures_compact_display_text(relevant_departures_bergkrystallen_via_storo, "Storo")
+    bergkrystallen_via_storo_text = get_relevant_departures_compact_display_text(
+        relevant_departures_bergkrystallen_via_storo, "Storo")
     return ringen_via_toyen_text + ringen_via_storo_text + bergkrystallen_via_storo_text
+
 
 def get_font():
     font_path = os.path.join(os.path.dirname(__file__), "fonts", "code2000.ttf")
