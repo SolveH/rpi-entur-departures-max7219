@@ -37,9 +37,9 @@ def cache_updater():
                 QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_SOUTH)
             cache[QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH] = get_estimated_calls_for_quay(
                 QUAY_ID_SINSEN_T_SUBWAY_DIRECTION_NORTH)
-        except Exception as e:
+        except Exception:
             now = datetime.datetime.now()
-            print(f"[{now}] Unable to fetch data from Entur. Cache was not updated.", e)
+            print(f"[{now}] Unable to fetch data from Entur. Cache was not updated.")
             traceback.print_exc()
         time.sleep(60)
 
